@@ -22,6 +22,7 @@ from smifront import views_auth, views_dashboard, views
 from smifront.sitemaps import sitemaps, RobotsTxtView  # Import correct du dictionnaire sitemaps
 from smifront.views import *
 from django.conf.urls import handler404
+from django.conf import settings
 
 handler404 = 'smifront.view_error.handler404'
 
@@ -71,5 +72,4 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

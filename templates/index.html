@@ -1449,6 +1449,281 @@
                 height: 45px;
             }
         }
+        
+        .search-container-responsive {
+    flex: 1;
+    margin: 0 30px;
+    position: relative;
+}
+
+.search-form-responsive {
+    width: 100%;
+}
+
+.search-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.search-group:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon-left {
+    position: absolute;
+    left: 16px;
+    color: #94A3B8;
+    font-size: 18px;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.search-input-modern {
+    width: 100%;
+    padding: 14px 16px 14px 45px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: #2D3748;
+    outline: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.search-input-modern::placeholder {
+    color: #94A3B8;
+}
+
+.search-input-modern:focus {
+    padding-left: 50px;
+}
+
+.search-input-modern:focus + .search-icon-left {
+    color: var(--accent-color);
+    transform: translateX(3px);
+}
+
+.clear-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #94A3B8;
+    cursor: pointer;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 0.8;
+}
+
+.clear-btn:hover {
+    color: #2D3748;
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.search-select-modern {
+    padding: 14px 20px;
+    border: 2px solid #E2E8F0;
+    border-radius: 25px;
+    background: #F9FAFB;
+    font-size: 15px;
+    color: #2D3748;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    min-width: 180px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.search-select-modern:hover {
+    border-color: var(--accent-color);
+    background: #ffffff;
+    transform: translateY(-1px);
+}
+
+.search-select-modern:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.1);
+}
+
+.search-btn-modern {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    white-space: nowrap;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+}
+
+.search-btn-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
+}
+
+.search-btn-modern:hover::before {
+    opacity: 1;
+}
+
+.search-btn-modern:active {
+    transform: translateY(-1px);
+}
+
+.search-btn-modern i,
+.search-btn-modern .btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-text {
+    display: inline;
+}
+
+/* Animation de chargement */
+.search-form-responsive.loading .search-btn-modern {
+    background: #94A3B8;
+    cursor: not-allowed;
+}
+
+.search-form-responsive.loading .search-btn-modern i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .search-container-responsive {
+        margin: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-group {
+        flex-direction: column;
+        padding: 16px;
+        border-radius: 20px;
+        gap: 12px;
+    }
+    
+    .search-input-wrapper {
+        width: 100%;
+    }
+    
+    .search-select-modern {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .search-btn-modern {
+        width: 100%;
+        justify-content: center;
+        padding: 16px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-text {
+        display: none;
+    }
+    
+    .search-btn-modern {
+        padding: 16px 20px;
+    }
+    
+    .search-btn-modern i {
+        font-size: 18px;
+    }
+    
+    .search-select-modern {
+        min-width: unset;
+        font-size: 14px;
+    }
+}
+
+/* Mode sombre (si votre site supporte le mode sombre) */
+@media (prefers-color-scheme: dark) {
+    .search-group {
+        background: #2D3748;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .search-input-modern {
+        color: #ffffff;
+        background: transparent;
+    }
+    
+    .search-input-modern::placeholder {
+        color: #94A3B8;
+    }
+    
+    .search-icon-left {
+        color: #94A3B8;
+    }
+    
+    .search-select-modern {
+        background: #3C4855;
+        color: #ffffff;
+        border-color: #4A5568;
+    }
+    
+    .search-select-modern:hover {
+        background: #4A5568;
+        border-color: var(--accent-color);
+    }
+    
+    .clear-btn {
+        color: #94A3B8;
+    }
+    
+    .clear-btn:hover {
+        color: #ffffff;
+    }
+}
     </style>
 </head>
 <body>
@@ -1458,25 +1733,42 @@
                 <div class="logo">
                     <img src="{% static 'images/logo.png' %}" alt="SMI Logo">
                 </div>
-                <div class="search-container">
-                    <form class="search-form" method="GET" action="{% url 'index' %}">
-                        <div class="search-input-container">
-                            <input type="text" name="q" class="search-input" placeholder="Rechercher un produit..." value="{{ search_query }}">
-                            <i class="fas fa-search search-icon"></i>
-                        </div>
-                        <select name="category" class="search-select">
-                            <option value="">Toutes les catégories</option>
-                            {% for category in categories %}
-                            <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_filter %}selected{% endif %}>
-                                {{ category.nom }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="search-btn">
-                            <i class="fas fa-search"></i> Rechercher
-                        </button>
-                    </form>
-                </div>
+                <div class="search-container-responsive">
+    <form class="search-form-responsive" method="GET" action="{% url 'index' %}">
+        <div class="search-group">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon-left"></i>
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="search-input-modern" 
+                    placeholder="Rechercher un produit..." 
+                    value="{{ search_query }}"
+                    autocomplete="off"
+                >
+                {% if search_query %}
+                <button type="button" class="clear-btn" onclick="this.previousElementSibling.value=''; this.style.display='none';">
+                    <i class="fas fa-times"></i>
+                </button>
+                {% endif %}
+            </div>
+            
+            <select name="category" class="search-select-modern">
+                <option value="">Toutes les catégories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_filter %}selected{% endif %}>
+                    {{ category.nom }}
+                </option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit" class="search-btn-modern">
+                <i class="fas fa-search"></i>
+                <span class="btn-text">Rechercher</span>
+            </button>
+        </div>
+    </form>
+</div>
             </nav>
         </div>
     </header>
@@ -1766,5 +2058,66 @@
             window.addEventListener('scroll', animateOnScroll);
         });
     </script>
+
+<script>
+// Script amélioré pour la barre de recherche
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-input-modern');
+    const clearBtn = document.querySelector('.clear-btn');
+    const searchForm = document.querySelector('.search-form-responsive');
+    
+    // Afficher/cacher le bouton clear
+    if (searchInput && clearBtn) {
+        // Vérifier l'état initial
+        if (searchInput.value) {
+            clearBtn.style.display = 'flex';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+        
+        searchInput.addEventListener('input', function() {
+            clearBtn.style.display = this.value ? 'flex' : 'none';
+        });
+        
+        // Réinitialiser le formulaire quand on clique sur clear
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            this.style.display = 'none';
+            searchInput.focus();
+        });
+    }
+    
+    // Ajouter l'état de chargement lors de la soumission
+    if (searchForm) {
+        searchForm.addEventListener('submit', function() {
+            this.classList.add('loading');
+        });
+    }
+    
+    // Auto-focus sur l'input de recherche (desktop uniquement)
+    if (searchInput && window.innerWidth > 768) {
+        searchInput.focus();
+    }
+    
+    // Effet de transition pour la barre de recherche au scroll
+    let lastScroll = 0;
+    const header = document.querySelector('header');
+    
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > lastScroll && currentScroll > 100) {
+            header.style.transform = 'translateY(-100%)';
+        } else {
+            header.style.transform = 'translateY(0)';
+        }
+        
+        lastScroll = currentScroll;
+    });
+    
+    // Ajouter une transition au header
+    header.style.transition = 'transform 0.3s ease-in-out';
+});
+</script>
 </body>
 </html>
