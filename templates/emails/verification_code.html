@@ -1,0 +1,176 @@
+{# templates/emails/verification_code.html #}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification de votre compte</title>
+    <style>
+        /* Styles globaux */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* En-tête */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header h1 {
+            color: #1976d2;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+
+        /* Contenu */
+        .content {
+            padding: 30px 20px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+        }
+
+        /* Code de vérification */
+        .code-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .verification-code {
+            font-size: 32px;
+            letter-spacing: 5px;
+            font-weight: bold;
+            color: #1976d2;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 2px dashed #1976d2;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .code-instruction {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        /* Bouton */
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #1976d2;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .social-links {
+            margin-top: 15px;
+        }
+
+        .social-link {
+            display: inline-block;
+            margin: 0 5px;
+            width: 30px;
+            height: 30px;
+            background-color: #1976d2;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .social-link img {
+            width: 16px;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .container {
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .verification-code {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vérification de votre compte</h1>
+        </div>
+
+        <div class="content">
+            <p class="greeting">Bonjour <strong>{{ user_name }}</strong>,</p>
+
+            <p class="message">Merci de vous être inscrit sur <strong>{{ site_name }}</strong>. Pour activer votre compte et accéder à tous nos services, veuillez utiliser le code de vérification ci-dessous :</p>
+
+            <div class="code-container">
+                <div class="verification-code">{{ code }}</div>
+                <p class="code-instruction">Ce code est valable pendant 30 minutes</p>
+            </div>
+
+            <p class="message">Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sécurité.</p>
+
+            <div class="button-container">
+                <a href="{% url 'index' %}" class="button">Aller sur {{ site_name }}</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Ce message a été envoyé automatiquement. Merci de ne pas y répondre.</p>
+            <p>&copy; {{ site_name }} - Tous droits réservés</p>
+        </div>
+    </div>
+</body>
+</html>

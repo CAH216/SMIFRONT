@@ -1,0 +1,1 @@
+web: gunicorn smifront.wsgi:application --log-file -

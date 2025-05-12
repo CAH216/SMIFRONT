@@ -1,0 +1,904 @@
+{% extends 'dashboard/base/base.html' %}
+
+{% block title %}Gestion des produits | SMI Application{% endblock %}
+
+{% block page_title %}Gestion des produits{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Styles existants... */
+
+    /* Styles pour les boutons de changement de statut */
+    .status-dropdown {
+        display: inline-block;
+        margin-left: 0.25rem;
+    }
+
+    .status-dropdown .dropdown-toggle {
+        background: transparent;
+        border: none;
+        padding: 0.375rem 0.5rem;
+        color: var(--text-secondary);
+    }
+
+    .status-dropdown .dropdown-toggle::after {
+        display: none;
+    }
+
+    .status-dropdown .dropdown-menu {
+        min-width: 200px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .status-dropdown .dropdown-header {
+        color: var(--text-secondary);
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .status-dropdown .dropdown-item {
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .status-dropdown .dropdown-item:hover {
+        background-color: var(--background-color);
+    }
+
+    .status-dropdown .dropdown-item.text-success:hover {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .status-dropdown .dropdown-item.text-danger:hover {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .status-dropdown .dropdown-item.text-warning:hover {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    /* Indicateur de mise à jour */
+    .updating-status {
+        position: relative;
+        opacity: 0.5;
+    }
+
+    .updating-status::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--primary-color);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Product Management Card -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <div class="card-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            Liste des produits
+        </h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+            <span class="btn-icon">
+                <i class="fas fa-plus"></i>
+            </span>
+            Ajouter un produit
+        </button>
+    </div>
+
+    <div class="card-content">
+        <div class="table-container">
+            <table id="productsTable" class="table table-hover dt-responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Prix</th>
+                        <th>Catégorie</th>
+                        <th>Statut</th>
+                        <th>Date de création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>
+                            {% if product.image_url %}
+                            <img src="{{ product.image_url }}" alt="{{ product.nom }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="text-center" style="width: 50px; height: 50px; background-color: var(--background-color); display: flex; align-items: center; justify-content: center; border-radius: var(--border-radius-sm);">
+                                <i class="fas fa-image text-secondary"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.nom }}</td>
+                        <td>{{ product.prix|floatformat:2 }} $</td>
+                        <td>
+                            <span class="badge rounded-pill" style="background-color: rgba(79, 70, 229, 0.1); color: var(--primary-color);">
+                                {{ product.categorie.nom }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if product.statut == 'VALIDE' %}
+                            <span class="status-badge status-active">
+                                <i class="fas fa-check-circle"></i> VALIDE
+                            </span>
+                            {% elif product.statut == 'INACTIF' %}
+                            <span class="status-badge status-inactive">
+                                <i class="fas fa-times-circle"></i> Inactif
+                            </span>
+                            {% elif product.statut == 'EN_ATTENTE' %}
+                            <span class="status-badge status-pending">
+                                <i class="fas fa-exclamation-circle"></i> EN_ATTENTE
+                            </span>
+                            {% else %}
+                            <span class="status-badge" style="background-color: rgba(107, 114, 128, 0.1); color: var(--text-secondary);">
+                                <i class="fas fa-question-circle"></i> {{ product.statut }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.date_creation|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-view" title="Voir" data-bs-toggle="modal" data-bs-target="#viewProductModal"
+                                        data-product-id="{{ product.id }}"
+                                        data-product-nom="{{ product.nom }}"
+                                        data-product-prix="{{ product.prix }}"
+                                        data-product-description="{{ product.description }}"
+                                        data-product-categorie="{{ product.categorie.id }}"
+                                        data-product-categorie-nom="{{ product.categorie.nom }}"
+                                        data-product-statut="{{ product.statut }}"
+                                        data-product-image="{{ product.image_url }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn btn-edit" title="Modifier" data-bs-toggle="modal" data-bs-target="#productModal"
+                                        data-product-id="{{ product.id }}"
+                                        data-product-nom="{{ product.nom }}"
+                                        data-product-prix="{{ product.prix }}"
+                                        data-product-description="{{ product.description }}"
+                                        data-product-categorie="{{ product.categorie.id }}"
+                                        data-product-statut="{{ product.statut }}"
+                                        data-product-image="{{ product.image_url }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn btn-delete" title="Supprimer" data-bs-toggle="modal" data-bs-target="#deleteProductModal"
+                                        data-product-id="{{ product.id }}"
+                                        data-product-nom="{{ product.nom }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Add/Edit Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Ajouter un produit</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="productForm" action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" id="productId">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="nom" class="form-label" style="color: #484848">Nom du produit</label>
+                                <input type="text" class="form-control" id="nom" name="nom" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="prix" class="form-label" style="color: #484848 ">Prix ($)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" min="0" class="form-control" id="prix" name="prix" required>
+                                    <span class="input-group-text">$</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categorie" class="form-label" style="color: #484848 " >Catégorie</label>
+                                <select class="form-select" id="categorie" name="categorie_id" required>
+                                    <option value="">Sélectionner une catégorie</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="statut" class="form-label" style="color: #484848 " >Statut</label>
+                                <select class="form-select" id="statut" name="statut">
+                                    <option value="VALIDE">VALIDE</option>
+                                    <option value="INACTIF">Inactif</option>
+                                    <option value="EN_ATTENTE">EN_ATTENTE</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #484848 ">Image du produit</label>
+                                <div class="d-flex flex-column align-items-center p-3 border rounded">
+                                    <div id="imagePreviewContainer" class="mb-3 text-center position-relative">
+                                        <img id="imagePreview" src="" alt="Aperçu de l'image" class="img-fluid rounded mb-2 d-none" style="max-height: 150px;">
+                                        <div id="noImagePlaceholder" class="text-center p-4 bg-light rounded">
+                                            <i class="fas fa-image fa-3x text-secondary mb-2"></i>
+                                            <p class="mb-0 text-secondary">Aucune image</p>
+                                        </div>
+                                        <button type="button" id="removeImage" class="btn btn-sm btn-danger position-absolute top-0 end-0 d-none" style="margin: 5px;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex flex-column w-100 gap-2">
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*">
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-text mt-2">
+                                        <i class="fas fa-info-circle me-1"></i> Format recommandé: 500x500px, 2Mo max.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label" style="color: #484848 ">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Product Modal -->
+<div class="modal fade" id="viewProductModal" tabindex="-1" aria-labelledby="viewProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewProductModalLabel">Détails du produit</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div id="productImageContainer" class="mb-3 p-3 bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <img id="productViewImage" src="" alt="Image du produit" class="img-fluid rounded d-none" style="max-height: 100%; max-width: 100%;">
+                            <div id="productNoImage" class="text-center">
+                                <i class="fas fa-image fa-3x text-secondary mb-2"></i>
+                                <p class="mb-0 text-secondary">Aucune image</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="productViewName" class="fw-bold mb-3" style="color: #484848 "></h4>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="fw-bold me-2" style="color: #484848 ">Statut:</span>
+                                <span id="productViewStatus"></span>
+                            </div>
+                            <div>
+                                <span class="fw-bold fs-4" id="productViewPrice" style="color: #484848 "></span>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <p class="fw-bold mb-1" style="color: #484848 ">Description:</p>
+                            <p id="productViewDescription" class="text-secondary" style="color: #484848 "></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Product Modal -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--danger-color);">
+                <h5 class="modal-title" id="deleteProductModalLabel">Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: rgba(239, 68, 68, 0.1); color: var(--danger-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h5>Êtes-vous sûr de vouloir supprimer ce produit ?</h5>
+                    <p class="text-secondary mb-0" id="deleteProductName"></p>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Cette action est irréversible et supprimera définitivement toutes les données associées à ce produit.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" action="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" id="deleteProductId">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Script spécifique à la page produits
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#productsTable').DataTable({
+        responsive: true,
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json',
+        },
+        columnDefs: [
+            { orderable: false, targets: [1, 7] }  // Disable sorting on image and actions columns
+        ],
+        order: [[0, 'desc']]  // Sort by ID descending by default
+    });
+        // Image preview functionality
+        $('#imageUpload').on('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').attr('src', e.target.result).removeClass('d-none');
+                    $('#noImagePlaceholder').addClass('d-none');
+                    $('#removeImage').removeClass('d-none');
+
+                    // Set a hidden field to track that we have a new image
+                    if (!$('#imageChanged').length) {
+                        $('<input>').attr({
+                            type: 'hidden',
+                            id: 'imageChanged',
+                            name: 'image_changed',
+                            value: 'true'
+                        }).appendTo('#productForm');
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Remove image
+        $('#removeImage').on('click', function() {
+            $('#imageUpload').val('');
+            $('#imagePreview').addClass('d-none').attr('src', '');
+            $('#noImagePlaceholder').removeClass('d-none');
+            $(this).addClass('d-none');
+
+            // Set hidden field to track image removal
+            if (!$('#imageRemoved').length) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'imageRemoved',
+                    name: 'image_removed',
+                    value: 'true'
+                }).appendTo('#productForm');
+            } else {
+                $('#imageRemoved').val('true');
+            }
+
+            if ($('#imageChanged').length) {
+                $('#imageChanged').val('false');
+            }
+        });
+
+
+
+        // Image library hover effect
+        $('.image-item').hover(
+            function() {
+                $(this).find('.image-overlay').css('opacity', '1');
+            },
+            function() {
+                $(this).find('.image-overlay').css('opacity', '0');
+            }
+        );
+
+        // Select image from library
+        $('.select-image').on('click', function() {
+            const imageUrl = $(this).data('image-url');
+            const imageId = $(this).data('image-id');
+
+            // Update preview
+            $('#imagePreview').attr('src', imageUrl).removeClass('d-none');
+            $('#noImagePlaceholder').addClass('d-none');
+            $('#removeImage').removeClass('d-none');
+
+            // Set hidden fields
+            if (!$('#selectedLibraryImage').length) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'selectedLibraryImage',
+                    name: 'library_image_id',
+                    value: imageId
+                }).appendTo('#productForm');
+            } else {
+                $('#selectedLibraryImage').val(imageId);
+            }
+
+            // Clear file upload
+            $('#imageUpload').val('');
+
+
+        });
+
+        // Product modal setup
+        $('#productModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const modal = $(this);
+            const form = $('#productForm');
+            const productId = button.data('product-id');
+
+            // Reset form
+            form[0].reset();
+            $('#imagePreview').addClass('d-none').attr('src', '');
+            $('#noImagePlaceholder').removeClass('d-none');
+            $('#removeImage').addClass('d-none');
+
+            // Remove any previously added hidden fields
+            $('#imageChanged, #imageRemoved, #selectedLibraryImage').remove();
+
+            if (productId) {
+                // Edit product mode
+                modal.find('.modal-title').text('Modifier le produit');
+                form.attr('action', "{% url 'admin_products_update' %}");
+
+                // Set form values
+                $('#productId').val(productId);
+                $('#nom').val(button.data('product-nom'));
+                $('#prix').val(button.data('product-prix'));
+                $('#description').val(button.data('product-description'));
+                $('#categorie').val(button.data('product-categorie'));
+                $('#statut').val(button.data('product-statut'));
+
+                // Set image preview if exists
+                const imageUrl = button.data('product-image');
+                if (imageUrl) {
+                    $('#imagePreview').attr('src', imageUrl).removeClass('d-none');
+                    $('#noImagePlaceholder').addClass('d-none');
+                    $('#removeImage').removeClass('d-none');
+                }
+            } else {
+                // Add product mode
+                modal.find('.modal-title').text('Ajouter un produit');
+                form.attr('action', "{% url 'admin_products_create' %}");
+            }
+        });
+
+        // View product modal setup
+        $('#viewProductModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const modal = $(this);
+
+            // Get product details
+            const productId = button.data('product-id');
+            const productNom = button.data('product-nom');
+            const productPrix = button.data('product-prix');
+            const productDescription = button.data('product-description') || 'Aucune description';
+            const productCategorie = button.data('product-categorie');
+            const productCategorieNom = button.data('product-categorie-nom');
+            const productStatut = button.data('product-statut');
+            const productImage = button.data('product-image');
+
+            // Set product details
+            $('#productViewName').text(productNom);
+            $('#productViewPrice').text(parseFloat(productPrix).toFixed(2) + ' $');
+            $('#productViewDescription').text(productDescription);
+            $('#productViewCategory').text(productCategorieNom);
+
+            // Format status display
+            let statusDisplay = '';
+            switch(productStatut) {
+                case 'VALIDE':
+                    statusDisplay = '<span class="status-badge status-active"><i class="fas fa-check-circle"></i> VALIDE</span>';
+                    break;
+                case 'INACTIF':
+                    statusDisplay = '<span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactif</span>';
+                    break;
+                case 'EN_ATTENTE':
+                    statusDisplay = '<span class="status-badge status-pending"><i class="fas fa-exclamation-circle"></i>EN_ATTENTE</span>';
+                    break;
+                default:
+                    statusDisplay = '<span class="status-badge" style="background-color: rgba(107, 114, 128, 0.1); color: var(--text-secondary);"><i class="fas fa-question-circle"></i> ' + productStatut + '</span>';
+            }
+            $('#productViewStatus').html(statusDisplay);
+
+
+            // Set image if exists
+            if (productImage) {
+                $('#productViewImage').attr('src', productImage).removeClass('d-none');
+                $('#productNoImage').addClass('d-none');
+            } else {
+                $('#productViewImage').addClass('d-none');
+                $('#productNoImage').removeClass('d-none');
+            }
+
+            // Set up edit button
+            $('#btnEditProduct').data('product-id', productId);
+            $('#btnEditProduct').data('product-nom', productNom);
+            $('#btnEditProduct').data('product-prix', productPrix);
+            $('#btnEditProduct').data('product-description', productDescription);
+            $('#btnEditProduct').data('product-categorie', productCategorie);
+            $('#btnEditProduct').data('product-statut', productStatut);
+            $('#btnEditProduct').data('product-image', productImage);
+        });
+
+        // Edit product from view modal
+        $('#btnEditProduct').on('click', function() {
+            const productId = $(this).data('product-id');
+            const productNom = $(this).data('product-nom');
+            const productPrix = $(this).data('product-prix');
+            const productDescription = $(this).data('product-description');
+            const productCategorie = $(this).data('product-categorie');
+            const productStatut = $(this).data('product-statut');
+            const productImage = $(this).data('product-image');
+
+            // Close view modal
+            $('#viewProductModal').modal('hide');
+
+            // Setup and open edit modal
+            setTimeout(function() {
+                const editModal = $('#productModal');
+
+                // Set modal title
+                editModal.find('.modal-title').text('Modifier le produit');
+                $('#productForm').attr('action', "{% url 'admin_products_update' %}");
+
+                // Set form values
+                $('#productId').val(productId);
+                $('#nom').val(productNom);
+                $('#prix').val(productPrix);
+                $('#description').val(productDescription !== 'Aucune description' ? productDescription : '');
+                $('#categorie').val(productCategorie);
+                $('#statut').val(productStatut);
+
+                // Set image preview if exists
+                if (productImage) {
+                    $('#imagePreview').attr('src', productImage).removeClass('d-none');
+                    $('#noImagePlaceholder').addClass('d-none');
+                    $('#removeImage').removeClass('d-none');
+                } else {
+                    $('#imagePreview').addClass('d-none');
+                    $('#noImagePlaceholder').removeClass('d-none');
+                    $('#removeImage').addClass('d-none');
+                }
+
+                // Open edit modal
+                editModal.modal('show');
+            }, 500);
+        });
+
+        // Delete product modal setup
+        $('#deleteProductModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const productId = button.data('product-id');
+            const productNom = button.data('product-nom');
+
+            $('#deleteProductId').val(productId);
+            $('#deleteProductName').text(productNom);
+            $('#deleteForm').attr('action', "{% url 'admin_products_delete' %}");
+        });
+
+        // Form validation for product form
+        $('#productForm').on('submit', function(event) {
+            const nom = $('#nom').val().trim();
+            const prix = parseFloat($('#prix').val());
+            const categorie = $('#categorie').val();
+
+            // Validation du nom
+            if (nom.length < 2) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nom trop court',
+                    text: 'Le nom du produit doit contenir au moins 2 caractères.',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+                return false;
+            }
+
+            // Validation du prix
+            if (isNaN(prix) || prix <= 0) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Prix invalide',
+                    text: 'Veuillez saisir un prix valide supérieur à 0.',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+                return false;
+            }
+
+            // Validation de la catégorie
+            if (!categorie) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Catégorie requise',
+                    text: 'Veuillez sélectionner une catégorie pour ce produit.',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+                return false;
+            }
+
+            return true;
+        });
+
+        // Submit form with SweetAlert confirmation for delete
+        $('#deleteForm').on('submit', function(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Êtes-vous vraiment sûr ?',
+                text: 'Cette action est irréversible !',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--danger-color)',
+                cancelButtonColor: 'var(--text-secondary)',
+                confirmButtonText: 'Oui, supprimer !',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+
+        // Check product name availability during creation
+        $('#nom').on('blur', function() {
+            const nom = $(this).val().trim();
+            const productId = $('#productId').val(); // Will be empty for new products
+
+            if (nom.length >= 2 && !productId) {
+                // Only check for new products
+                $.ajax({
+                    url: "{% url 'admin_check_product_name' %}",
+                    type: 'GET',
+                    data: { nom: nom },
+                    success: function(response) {
+                        if (response.exists) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Nom déjà utilisé',
+                                text: 'Ce nom de produit existe déjà.',
+                                confirmButtonColor: 'var(--primary-color)'
+                            });
+                            $('#nom').addClass('is-invalid');
+                        } else {
+                            $('#nom').removeClass('is-invalid');
+                            $('#nom').addClass('is-valid');
+                        }
+                    },
+                    error: function() {
+                        console.error('Erreur lors de la vérification du nom du produit');
+                    }
+                });
+            }
+        });
+
+   // Fonction pour obtenir la configuration du statut
+    function getStatusConfig(status) {
+        const configs = {
+            'VALIDE': {
+                title: 'Activer le produit',
+                buttonColor: '#10B981',
+                buttonText: 'Activer',
+                successMessage: 'Le produit a été activé avec succès.'
+            },
+            'INACTIF': {
+                title: 'Désactiver le produit',
+                buttonColor: '#EF4444',
+                buttonText: 'Désactiver',
+                successMessage: 'Le produit a été désactivé avec succès.'
+            },
+            'EN_ATTENTE': {
+                title: 'Mettre en attente',
+                buttonColor: '#F59E0B',
+                buttonText: 'Mettre en attente',
+                successMessage: 'Le produit a été mis en attente avec succès.'
+            }
+        };
+        return configs[status];
+    }
+    
+    // Fonction pour mettre à jour le statut
+    function updateProductStatus(productId, status, productName) {
+        Swal.fire({
+            title: 'Mise à jour en cours...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        $.ajax({
+            url: '{% url "admin_products_status" %}',
+            type: 'POST',
+            data: {
+                product_id: productId,
+                status: status,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    const statusConfig = getStatusConfig(status);
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Statut mis à jour',
+                        text: statusConfig.successMessage,
+                        confirmButtonColor: '#3B82F6',
+                        timer: 1500,
+                        timerProgressBar: true
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: response.message || 'Une erreur est survenue.',
+                        confirmButtonColor: '#3B82F6'
+                    });
+                }
+            },
+            error: function(xhr) {
+                let errorMessage = 'Une erreur est survenue lors de la mise à jour du statut.';
+                
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMessage = response.message;
+                    }
+                } catch (e) {
+                    console.error('Erreur:', e);
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: errorMessage,
+                    confirmButtonColor: '#3B82F6'
+                });
+            }
+        });
+    }
+    
+    // Ajouter les boutons de statut après le chargement de DataTable
+    setTimeout(function() {
+        $('#productsTable tbody tr').each(function() {
+            const row = $(this);
+            const productId = row.find('td:first').text().trim();
+            const productNom = row.find('td:nth-child(3)').text().trim();
+            const currentStatus = row.find('td:nth-child(6) .status-badge').text().trim();
+            
+            const actionsCell = row.find('td:last-child .action-buttons');
+            
+            if (!actionsCell.find('.status-buttons').length) {
+                let statusButtons = '<div class="status-buttons">';
+                
+                if (currentStatus !== 'VALIDE') {
+                    statusButtons += `<button class="btn btn-sm btn-success status-action" title="Activer" 
+                        data-status="VALIDE" data-product-id="${productId}" data-product-name="${productNom}">
+                        <i class="fas fa-check-circle"></i>
+                    </button>`;
+                }
+                
+                if (currentStatus !== 'INACTIF' && currentStatus !== 'Inactif') {
+                    statusButtons += `<button class="btn btn-sm btn-danger status-action" title="Désactiver" 
+                        data-status="INACTIF" data-product-id="${productId}" data-product-name="${productNom}">
+                        <i class="fas fa-ban"></i>
+                    </button>`;
+                }
+                
+                if (currentStatus !== 'EN_ATTENTE' && currentStatus !== 'En attente') {
+                    statusButtons += `<button class="btn btn-sm btn-warning status-action" title="En attente" 
+                        data-status="EN_ATTENTE" data-product-id="${productId}" data-product-name="${productNom}">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </button>`;
+                }
+                
+                statusButtons += '</div>';
+                actionsCell.append(statusButtons);
+            }
+        });
+    }, 100);
+    
+    // Gestionnaire d'événements pour les boutons de statut
+    $(document).on('click', '.status-action', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const $this = $(this);
+        const status = $this.data('status');
+        const productId = $this.data('product-id');
+        const productName = $this.data('product-name');
+        
+        console.log('Bouton cliqué:', { status, productId, productName }); // Debug
+        
+        const statusConfig = getStatusConfig(status);
+        
+        Swal.fire({
+            title: statusConfig.title,
+            html: `Êtes-vous sûr de vouloir changer le statut de <strong>${productName}</strong> ?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: statusConfig.buttonColor,
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: statusConfig.buttonText,
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateProductStatus(productId, status, productName);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+
+ 

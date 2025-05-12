@@ -1,0 +1,271 @@
+{% extends 'dashboard/base/base.html' %}
+
+{% block title %}Gestion des catégories | SMI Application{% endblock %}
+
+{% block page_title %}Gestion des catégories{% endblock %}
+
+{% block content %}
+<!-- Categories Management Card -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <div class="card-icon">
+                <i class="fas fa-tags"></i>
+            </div>
+            Liste des catégories
+        </h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+            <span class="btn-icon">
+                <i class="fas fa-plus"></i>
+            </span>
+            Ajouter une catégorie
+        </button>
+    </div>
+    
+    <div class="card-content">
+        <div class="table-container">
+            <table id="categoriesTable" class="table table-hover dt-responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Nombre de produits</th>
+                        <th>Date de création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.nom }}</td>
+                        <td>{{ category.product_count|default:"0" }}</td>
+                        <td>{{ category.date_creation|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-edit" title="Modifier" data-bs-toggle="modal" data-bs-target="#categoryModal" 
+                                        data-category-id="{{ category.id }}" 
+                                        data-category-nom="{{ category.nom }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn btn-delete" title="Supprimer" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal" 
+                                        data-category-id="{{ category.id }}" 
+                                        data-category-nom="{{ category.nom }}"
+                                        data-category-product-count="{{ category.product_count|default:'0' }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Add/Edit Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Ajouter une catégorie</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="categoryForm" action="" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="category_id" id="categoryId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Nom de la catégorie</label>
+                        <input type="text" class="form-control" id="nom" name="nom" required>
+                        <div class="form-text" id="nomHelp">
+                            <i class="fas fa-info-circle me-1"></i> Le nom doit être unique
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Category Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--danger-color);">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: rgba(239, 68, 68, 0.1); color: var(--danger-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h5>Êtes-vous sûr de vouloir supprimer cette catégorie ?</h5>
+                    <p class="text-secondary mb-0" id="deleteCategoryName"></p>
+                </div>
+                <div id="categoryHasProductsWarning" class="alert alert-warning d-none">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Cette catégorie contient <span id="productCount"></span> produit(s). La suppression de la catégorie entraînera la suppression ou le déplacement de ces produits.
+                </div>
+                <div class="alert alert-danger">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Cette action est irréversible.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" action="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="category_id" id="deleteCategoryId">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#categoriesTable').DataTable({
+            responsive: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json',
+            },
+            columnDefs: [
+                { orderable: false, targets: 4 }  // Disable sorting on action column
+            ],
+            order: [[0, 'desc']]  // Sort by ID descending by default
+        });
+        
+        // Category modal setup
+        $('#categoryModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const modal = $(this);
+            const form = $('#categoryForm');
+            const categoryId = button.data('category-id');
+            
+            // Reset form
+            form[0].reset();
+            
+            if (categoryId) {
+                // Edit category mode
+                modal.find('.modal-title').text('Modifier la catégorie');
+                form.attr('action', "{% url 'admin_categories_update' %}");
+                
+                // Set form values
+                $('#categoryId').val(categoryId);
+                $('#nom').val(button.data('category-nom'));
+            } else {
+                // Add category mode
+                modal.find('.modal-title').text('Ajouter une catégorie');
+                form.attr('action', "{% url 'admin_categories_create' %}");
+            }
+        });
+        
+        // Delete category modal setup
+        $('#deleteCategoryModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const categoryId = button.data('category-id');
+            const categoryNom = button.data('category-nom');
+            const productCount = parseInt(button.data('category-product-count'));
+            
+            $('#deleteCategoryId').val(categoryId);
+            $('#deleteCategoryName').text(categoryNom);
+            
+            // Show warning if category has products
+            if (productCount > 0) {
+                $('#productCount').text(productCount);
+                $('#categoryHasProductsWarning').removeClass('d-none');
+            } else {
+                $('#categoryHasProductsWarning').addClass('d-none');
+            }
+            
+            // Set form action
+            $('#deleteForm').attr('action', "{% url 'admin_categories_delete' %}");
+        });
+        
+        // Form validation
+        $('#categoryForm').on('submit', function(event) {
+            const nom = $('#nom').val().trim();
+            
+            if (nom.length < 2) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nom trop court',
+                    text: 'Le nom de la catégorie doit contenir au moins 2 caractères.',
+                    confirmButtonColor: 'var(--primary-color)'
+                });
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Submit form with SweetAlert confirmation for delete
+        $('#deleteForm').on('submit', function(event) {
+            event.preventDefault();
+            
+            Swal.fire({
+                title: 'Êtes-vous vraiment sûr ?',
+                text: 'Cette action est irréversible !',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--danger-color)',
+                cancelButtonColor: 'var(--text-secondary)',
+                confirmButtonText: 'Oui, supprimer !',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+        
+        // Check category name availability during creation
+        $('#nom').on('blur', function() {
+            const nom = $(this).val().trim();
+            const categoryId = $('#categoryId').val(); // Will be empty for new categories
+            
+            if (nom.length >= 2 && !categoryId) {
+                // Only check for new categories
+                $.ajax({
+                    url: "{% url 'admin_check_category_name' %}",
+                    type: 'GET',
+                    data: { nom: nom },
+                    success: function(response) {
+                        if (response.exists) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Nom déjà utilisé',
+                                text: 'Ce nom de catégorie existe déjà.',
+                                confirmButtonColor: 'var(--primary-color)'
+                            });
+                            $('#nom').addClass('is-invalid');
+                        } else {
+                            $('#nom').removeClass('is-invalid');
+                            $('#nom').addClass('is-valid');
+                        }
+                    },
+                    error: function() {
+                        console.error('Erreur lors de la vérification du nom de catégorie');
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

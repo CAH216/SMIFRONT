@@ -1,0 +1,1006 @@
+{# templates/signup.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription | SMI Application</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo.png' %}}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-light: #818CF8;
+            --primary-dark: #4338CA;
+            --accent-color: #06B6D4;
+            --success-color: #10B981;
+            --success-light: #6EE7B7;
+            --text-color: #1F2937;
+            --text-secondary: #6B7280;
+            --background-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --border-radius: 1.25rem;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Formes abstraites en arrière-plan */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, var(--primary-light), var(--accent-color));
+            top: -100px;
+            right: -100px;
+            opacity: 0.15;
+            filter: blur(30px);
+        }
+        
+        .shape-2 {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+            bottom: -100px;
+            left: -50px;
+            opacity: 0.15;
+            filter: blur(25px);
+        }
+        
+        .shape-3 {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(45deg, var(--success-color), var(--success-light));
+            top: 40%;
+            left: 10%;
+            opacity: 0.1;
+            filter: blur(20px);
+        }
+        
+        .signup-container {
+            width: 100%;
+            max-width: 700px;
+            perspective: 1000px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-md);
+            transform-style: preserve-3d;
+            transition: transform 0.6s, box-shadow 0.3s;
+            backface-visibility: hidden;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px) rotateX(1deg) rotateY(1deg);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 1.5rem;
+            border-bottom: none;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            top: -50%;
+            left: -50%;
+        }
+        
+        .card-header h1 {
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            font-size: 2rem;
+        }
+        
+        .card-header p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0.5rem 0 0;
+            position: relative;
+            z-index: 1;
+            font-size: 1rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.15);
+        }
+        
+        .input-group > .form-control {
+            border-top-right-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+        }
+        
+        .input-group-text {
+            border-top-left-radius: 0.75rem;
+            border-bottom-left-radius: 0.75rem;
+            background-color: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-right: none;
+            color: var(--text-secondary);
+        }
+        
+        .btn-outline-secondary {
+            border-top-right-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-left: none;
+            background-color: #f3f4f6;
+            color: var(--text-secondary);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #e5e7eb;
+            color: var(--text-color);
+        }
+        
+        .form-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .invalid-feedback {
+            font-size: 0.85rem;
+        }
+        
+        .form-check-input {
+            border-radius: 0.25rem;
+            border: 2px solid #e5e7eb;
+            width: 1.1em;
+            height: 1.1em;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-check-label a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .form-check-label a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        .btn-primary {
+            border-radius: var(--border-radius);
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+            border: none;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
+        }
+        
+        .btn-primary:after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            top: -50px;
+            left: -100px;
+            transform: rotate(35deg);
+            transition: all 0.8s;
+        }
+        
+        .btn-primary:hover:after {
+            left: 120%;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .login-link a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+        }
+        
+        .progress-step.active:not(:last-child)::after {
+            background-color: var(--primary-color);
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            position: relative;
+            z-index: 1;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+        
+        .step-number i {
+            font-size: 1.2rem;
+        }
+        
+        .progress-step.active .step-number {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 5px rgba(79, 70, 229, 0.2);
+        }
+        
+        .step-title {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .progress-step.active .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+        
+        .how-it-works {
+            margin-top: 1.5rem;
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .how-it-works:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .how-it-works .card-body {
+            padding: 1.5rem;
+        }
+        
+        .how-it-works ol {
+            margin-bottom: 0;
+            padding-left: 1.25rem;
+        }
+        
+        .how-it-works ol li {
+            padding: 0.35rem 0;
+            color: var(--text-secondary);
+        }
+        
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+        }
+        
+        .back-to-home:hover {
+            background-color: #5e81ef;
+            box-shadow: var(--shadow-sm);
+            transform: translateX(-3px);
+        }
+        
+        .back-to-home i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Indicateur de force du mot de passe */
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+        }
+        
+        .strength-weak {
+            background-color: #EF4444;
+            width: 25%;
+        }
+        
+        .strength-medium {
+            background-color: #F59E0B;
+            width: 50%;
+        }
+        
+        .strength-good {
+            background-color: #3B82F6;
+            width: 75%;
+        }
+        
+        .strength-strong {
+            background-color: #10B981;
+            width: 100%;
+        }
+        
+        .password-strength-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: right;
+            margin-top: 0.35rem;
+            transition: all 0.3s;
+        }
+        
+        .strength-text-weak {
+            color: #EF4444;
+        }
+        
+        .strength-text-medium {
+            color: #F59E0B;
+        }
+        
+        .strength-text-good {
+            color: #3B82F6;
+        }
+        
+        .strength-text-strong {
+            color: #10B981;
+        }
+        
+        @media (max-width: 991.98px) {
+            .progress-container {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            
+            .progress-step {
+                flex-basis: calc(50% - 1rem);
+            }
+            
+            .progress-step:not(:last-child)::after {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .card-header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .progress-step {
+                flex-basis: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+            
+            .step-title {
+                font-size: 0.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Mode sombre */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #F3F4F6;
+                --text-secondary: #D1D5DB;
+                --background-color: #111827;
+                --card-bg: #1F2937;
+            }
+            
+            body {
+                background-image: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            }
+            
+            .form-control,
+            .input-group-text,
+            .btn-outline-secondary {
+                border-color: #374151;
+                background-color: #1F2937;
+                color: #F3F4F6;
+            }
+            
+            .form-control:focus {
+                background-color: #1F2937;
+                color: #F3F4F6;
+            }
+            
+            .input-group-text,
+            .btn-outline-secondary {
+                background-color: #111827;
+            }
+            
+            .btn-outline-secondary:hover {
+                background-color: #374151;
+                color: #F3F4F6;
+            }
+            
+            .form-check-input {
+                border-color: #374151;
+                background-color: #1F2937;
+            }
+            
+            .password-strength {
+                background-color: #374151;
+            }
+            
+            .step-number {
+                background-color: #111827;
+                border-color: #374151;
+            }
+            
+            .how-it-works,
+            .back-to-home {
+                background-color: rgba(31, 41, 55, 0.8);
+                color: #F3F4F6;
+            }
+            
+            .how-it-works ol li {
+                color: #D1D5DB;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Formes abstraites en arrière-plan -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    
+    <div class="signup-container">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h1>Créer un compte</h1>
+                <p>Rejoignez notre plateforme pour accéder à tous nos produits et services</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Indicateur de progression -->
+                <div class="progress-container">
+                    <div class="progress-step active">
+                        <div class="step-number"><i class="fas fa-user-plus"></i></div>
+                        <div class="step-title">Inscription</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Vérification</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Profil</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Finalisation</div>
+                    </div>
+                </div>
+                
+                <form method="post" action="{% url 'signup' %}" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="prenom" class="form-label">Prénom</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="prenom" name="prenom" value="{{ prenom|default:'' }}" required>
+                            </div>
+                            <div class="invalid-feedback">
+                                Veuillez saisir votre prénom.
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="nom" class="form-label">Nom</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="nom" name="nom" value="{{ nom|default:'' }}" required>
+                            </div>
+                            <div class="invalid-feedback">
+                                Veuillez saisir votre nom.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 mt-3">
+                        <label for="email" class="form-label">Adresse email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" required placeholder="vous@exemple.com">
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-shield-alt me-1"></i> Nous ne partagerons jamais votre email avec des tiers.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar"></div>
+                        </div>
+                        <div class="password-strength-text"></div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i> Votre mot de passe doit contenir au moins 8 caractères.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password_confirm" class="form-label">Confirmer le mot de passe</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                        </div>
+                        <div class="invalid-feedback">
+                            Les mots de passe ne correspondent pas.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                J'accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">conditions d'utilisation</a> et la <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">politique de confidentialité</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                Vous devez accepter les conditions d'utilisation pour continuer.
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i> Créer mon compte
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="login-link">
+                    <span>Vous avez déjà un compte?</span>
+                    <a href="{% url 'login' %}" class="ms-1">Connectez-vous</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="how-it-works">
+            <div class="card-body">
+                <h5 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Comment ça marche
+                </h5>
+                <ol>
+                    <li>Créez votre compte avec vos informations personnelles</li>
+                    <li>Un code de vérification sera envoyé à votre adresse email</li>
+                    <li>Saisissez ce code pour valider votre compte</li>
+                    <li>Complétez votre profil et accédez à tous nos services</li>
+                </ol>
+            </div>
+        </div>
+        
+        <a href="{% url 'index' %}" class="back-to-home">
+            <i class="fas fa-arrow-left"></i> Retour à l'accueil
+        </a>
+    </div>
+    
+    <!-- Script JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle Password Visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                // Change input type
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Change icon
+                const eyeIcon = this.querySelector('i');
+                eyeIcon.classList.toggle('fa-eye');
+                eyeIcon.classList.toggle('fa-eye-slash');
+            });
+            
+            // Password Strength Meter
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.querySelector('.password-strength-bar');
+            const strengthText = document.querySelector('.password-strength-text');
+            
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                // Check password length
+                if (password.length >= 8) {
+                    strength += 1;
+                }
+                
+                // Check for mixed case
+                if (password.match(/[a-z]/) && password.match(/[A-Z]/)) {
+                    strength += 1;
+                }
+                
+                // Check for numbers
+                if (password.match(/\d/)) {
+                    strength += 1;
+                }
+                
+                // Check for special characters
+                if (password.match(/[^a-zA-Z\d]/)) {
+                    strength += 1;
+                }
+                
+                // Update strength bar and text
+                strengthBar.className = 'password-strength-bar';
+                strengthText.className = 'password-strength-text';
+                
+                switch(strength) {
+                    case 0:
+                        strengthBar.classList.add('strength-weak');
+                        strengthText.classList.add('strength-text-weak');
+                        strengthText.textContent = 'Faible';
+                        break;
+                    case 1:
+                        strengthBar.classList.add('strength-weak');
+                        strengthText.classList.add('strength-text-weak');
+                        strengthText.textContent = 'Faible';
+                        break;
+                    case 2:
+                        strengthBar.classList.add('strength-medium');
+                        strengthText.classList.add('strength-text-medium');
+                        strengthText.textContent = 'Moyen';
+                        break;
+                    case 3:
+                        strengthBar.classList.add('strength-good');
+                        strengthText.classList.add('strength-text-good');
+                        strengthText.textContent = 'Bon';
+                        break;
+                    case 4:
+                        strengthBar.classList.add('strength-strong');
+                        strengthText.classList.add('strength-text-strong');
+                        strengthText.textContent = 'Fort';
+                        break;
+                }
+                
+                if (password.length === 0) {
+                    strengthBar.style.width = '0';
+                    strengthText.textContent = '';
+                }
+            });
+            
+            // Form Validation
+            const form = document.querySelector('.needs-validation');
+            const passwordConfirm = document.getElementById('password_confirm');
+            
+            // Real-time password match validation
+            passwordConfirm.addEventListener('input', function() {
+                if (password.value !== passwordConfirm.value) {
+                    passwordConfirm.setCustomValidity('Les mots de passe ne correspondent pas');
+                    passwordConfirm.classList.add('is-invalid');
+                } else {
+                    passwordConfirm.setCustomValidity('');
+                    passwordConfirm.classList.remove('is-invalid');
+                    passwordConfirm.classList.add('is-valid');
+                }
+            });
+            
+            password.addEventListener('input', function() {
+                if (passwordConfirm.value && password.value !== passwordConfirm.value) {
+                    passwordConfirm.setCustomValidity('Les mots de passe ne correspondent pas');
+                    passwordConfirm.classList.add('is-invalid');
+                } else if (passwordConfirm.value) {
+                    passwordConfirm.setCustomValidity('');
+                    passwordConfirm.classList.remove('is-invalid');
+                    passwordConfirm.classList.add('is-valid');
+                }
+            });
+            
+            // Form submission validation
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Check that passwords match
+                if (password.value !== passwordConfirm.value) {
+                    passwordConfirm.setCustomValidity('Les mots de passe ne correspondent pas');
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    passwordConfirm.setCustomValidity('');
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Add special animation to the create account button
+            const submitButton = document.querySelector('button[type="submit"]');
+            submitButton.addEventListener('mouseover', function() {
+                this.classList.add('pulse');
+            });
+            
+            submitButton.addEventListener('mouseout', function() {
+                this.classList.remove('pulse');
+            });
+            
+            // Smooth scroll effect for links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Add floating animation to form fields when focused
+            const formControls = document.querySelectorAll('.form-control');
+            formControls.forEach(control => {
+                control.addEventListener('focus', function() {
+                    this.closest('.input-group').style.transform = 'translateY(-3px)';
+                    this.closest('.input-group').style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                    this.closest('.input-group').style.transition = 'all 0.3s ease';
+                });
+                
+                control.addEventListener('blur', function() {
+                    this.closest('.input-group').style.transform = 'translateY(0)';
+                    this.closest('.input-group').style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+    
+    <!-- Modals for Terms and Privacy -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white;">
+                    <h5 class="modal-title" id="termsModalLabel">Conditions d'utilisation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body" style="color: #484444">
+                    <h6 class="mb-3" >1. Acceptation des conditions</h6>
+                    <p>En utilisant notre application, vous acceptez d'être lié par les présentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser l'application.</p>
+                    
+                    <h6 class="mb-3">2. Comptes utilisateurs</h6>
+                    <p>Pour utiliser certaines fonctionnalités de l'application, vous devez créer un compte. Vous êtes responsable de maintenir la confidentialité de vos informations de compte et de toutes les activités qui se produisent sous votre compte.</p>
+                    
+                    <h6 class="mb-3">3. Utilisation acceptable</h6>
+                    <p>Vous acceptez de ne pas utiliser l'application pour des fins illégales ou interdites par ces conditions. Vous ne devez pas transmettre de contenu nuisible, menaçant, abusif, diffamatoire, ou autrement répréhensible.</p>
+                    
+                    <h6 class="mb-3">4. Propriété intellectuelle</h6>
+                    <p>L'application et tout son contenu, fonctionnalités et fonctionnalités sont la propriété exclusive de notre entreprise. L'utilisation de l'application ne vous confère aucun droit de propriété intellectuelle.</p>
+                    
+                    <h6 class="mb-3">5. Limitation de responsabilité</h6>
+                    <p>En aucun cas, notre entreprise ne sera responsable des dommages directs, indirects, spéciaux, consécutifs ou exemplaires résultant de l'utilisation ou de l'incapacité d'utiliser l'application.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">J'ai compris</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white;">
+                    <h5 class="modal-title" id="privacyModalLabel">Politique de confidentialité</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body" style="color: #484444">
+                    <h6 class="mb-3">1. Collecte d'informations</h6>
+                    <p>Nous collectons des informations personnelles telles que votre nom, adresse email, et informations de profil lorsque vous créez un compte. Nous pouvons également collecter des informations sur votre utilisation de l'application.</p>
+                    
+                    <h6 class="mb-3">2. Utilisation des informations</h6>
+                    <p>Nous utilisons vos informations pour fournir et améliorer nos services, communiquer avec vous, et personnaliser votre expérience. Nous pouvons également utiliser vos informations pour vous envoyer des mises à jour et des offres promotionnelles.</p>
+                    
+                    <h6 class="mb-3">3. Protection des informations</h6>
+                    <p>Nous prenons des mesures de sécurité appropriées pour protéger vos informations personnelles contre tout accès non autorisé ou toute divulgation. Cependant, aucune méthode de transmission sur Internet n'est totalement sécurisée.</p>
+                    
+                    <h6 class="mb-3">4. Partage des informations</h6>
+                    <p>Nous ne vendons pas vos informations personnelles à des tiers. Nous pouvons partager vos informations avec des fournisseurs de services qui nous aident à exploiter notre application.</p>
+                    
+                    <h6 class="mb-3">5. Vos droits</h6>
+                    <p>Vous avez le droit d'accéder, de corriger ou de supprimer vos informations personnelles. Vous pouvez également vous désinscrire de nos communications marketing à tout moment.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">J'ai compris</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

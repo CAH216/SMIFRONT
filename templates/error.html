@@ -1,0 +1,125 @@
+{# templates/error.html #}
+{% extends "base.html" %}
+
+{% block title %}Erreur - {{ error_type }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white py-3">
+                <h2 class="card-title text-center m-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Erreur
+                </h2>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="error-icon mb-3">
+                        <i class="fas fa-exclamation-circle fa-5x text-danger"></i>
+                    </div>
+                    <h3 class="mb-2">{{ error_type }}</h3>
+                    <p class="error-message lead">
+                        {{ error_message }}
+                    </p>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Une notification a été envoyée à notre équipe technique. Nous travaillons à résoudre ce problème au plus vite.
+                </div>
+                
+                <div class="error-actions d-flex flex-column flex-md-row justify-content-center gap-3 mt-4">
+                    <a href="{% url 'index' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Retour à l'accueil
+                    </a>
+                    <button onclick="window.history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Page précédente
+                    </button>
+                </div>
+                
+                {% if show_details %}
+                <div class="error-details mt-5">
+                    <div class="accordion" id="errorDetailsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="technicalHeading">
+                                <button class="accordion-button collapsed" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#technicalDetails" 
+                                        aria-expanded="false" aria-controls="technicalDetails">
+                                    Détails techniques
+                                </button>
+                            </h2>
+                            <div id="technicalDetails" class="accordion-collapse collapse" 
+                                 aria-labelledby="technicalHeading" data-bs-parent="#errorDetailsAccordion">
+                                <div class="accordion-body">
+                                    <p>Type d'erreur: <code>{{ error_type }}</code></p>
+                                    <p>Message complet: <code>{{ error_message }}</code></p>
+                                    
+                                    {% if traceback %}
+                                    <h5>Traceback:</h5>
+                                    <div class="traceback">
+                                        <pre class="bg-light p-3 rounded"><code>{{ traceback }}</code></pre>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4 shadow-sm">
+            <div class="card-body p-3">
+                <div class="d-flex">
+                    <div class="me-3">
+                        <i class="fas fa-headset text-primary fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Besoin d'aide?</h5>
+                        <p class="card-text mb-0">
+                            Si le problème persiste, n'hésitez pas à contacter notre équipe de support technique.
+                        </p>
+                        <a href="#" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="fas fa-envelope me-1"></i> Contacter le support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-icon {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-10px); }
+        40%, 80% { transform: translateX(10px); }
+    }
+    
+    .error-message {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+        padding: 15px;
+        border-radius: 4px;
+    }
+    
+    .traceback {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .traceback pre {
+        white-space: pre-wrap;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: smifront
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn smifront.wsgi:application --bind 0.0.0.0:$PORT
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: smifront.onrender.com,*.onrender.com
+      - key: API_BASE_URL
+        value: https://smiback.onrender.com/api
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: ALERT_ADMIN_EMAIL
+        value: admin@smi.com
+      - key: SITE_NAME
+        value: Super Marché International
+      - key: ALERT_EMAILS_ENABLED
+        value: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: .onrender.com
+      - key: PYTHON_VERSION
+        value: 3.11.0

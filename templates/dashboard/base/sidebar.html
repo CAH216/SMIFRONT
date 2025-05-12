@@ -1,0 +1,43 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <div class="logo">S</div>
+            <div class="logo-text">SMI App</div>
+        </div>
+        <button class="toggle-sidebar" id="toggleSidebar">
+            <i class="fas fa-chevron-left toggle-icon"></i>
+        </button>
+    </div>
+    
+    <div class="sidebar-content">
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Gestion</div>
+            <a href="{% url 'dashboard' %}" class="nav-link {% if active_page == 'users' %}active{% endif %}">
+                <i class="fas fa-users nav-icon"></i>
+                <span class="nav-text">Utilisateurs</span>
+            </a>
+            <a href="{% url 'admin_products' %}" class="nav-link {% if active_page == 'products' %}active{% endif %}">
+                <i class="fas fa-shopping-bag nav-icon"></i>
+                <span class="nav-text">Produits</span>
+            </a>
+            <a href="{% url 'admin_categories' %}" class="nav-link {% if active_page == 'categories' %}active{% endif %}">
+                <i class="fas fa-tags nav-icon"></i>
+                <span class="nav-text">Catégories</span>
+            </a>
+        </div>
+    
+    </div>
+    
+    <div class="sidebar-footer">
+        <div class="user-avatar">
+            {{ request.user_name|slice:":1" }}
+        </div>
+        <div class="user-info">
+            <div class="user-name">{{ request.user_name }}</div>
+            <div class="user-role">{{ request.user_role }}</div>
+        </div>
+        <a href="{% url 'logout' %}" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </div>
+</aside>

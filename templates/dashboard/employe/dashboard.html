@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Employé - Ajout de produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --primary-hover: #2563EB;
+            --success-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand:hover {
+            color: var(--primary-hover);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-role {
+            font-size: 0.875rem;
+        }
+        
+        .btn-outline-danger {
+            background: transparent;
+            border: 2px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-outline-danger:hover {
+            background: var(--danger-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .main-container {
+            padding: 2rem 1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-section p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .add-product-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--background-color);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: var(--primary-color);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-quick {
+            background: var(--background-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-quick:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label .required {
+            color: var(--danger-color);
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid transparent;
+            background: var(--background-color);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #9CA3AF;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group-text {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .image-section {
+            background: var(--background-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .image-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-image {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-image:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-image.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .image-preview-container {
+            position: relative;
+            text-align: center;
+        }
+
+        .image-preview {
+            display: inline-block;
+            position: relative;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .remove-image {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: var(--danger-color);
+            color: white;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .remove-image:hover {
+            background: #DC2626;
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .upload-placeholder {
+            border: 3px dashed var(--border-color);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-placeholder:hover {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-placeholder.dragover {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-placeholder i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-placeholder p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .video-container {
+            display: none;
+            position: relative;
+            max-width: 100%;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        #camera-video {
+            width: 100%;
+            height: auto;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-camera-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-camera-control:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .btn-camera-control.capture {
+            background: var(--danger-color);
+            color: white;
+            width: 80px;
+            height: 80px;
+        }
+
+        .btn-camera-control.capture:hover {
+            background: #DC2626;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 10px -1px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 10px -1px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--background-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(500px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.5rem;
+        }
+
+        .product-counter {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .add-product-card {
+                padding: 1.5rem;
+            }
+
+            .header-section h1 {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-buttons {
+                flex-direction: column;
+            }
+
+            .btn-image {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Keyboard shortcuts */
+        .shortcut-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .shortcut-hint.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-store"></i>
+                <span>SMI Application</span>
+            </a>
+            <div class="user-info">
+                <div class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+                <div class="user-role">Employé</div>
+                <button class="btn btn-outline-danger btn-sm ms-3" onclick="confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header-section">
+            <h1>Ajout Rapide de Produits</h1>
+            <p>Gérez efficacement votre inventaire</p>
+        </div>
+
+        <!-- Product Form Card -->
+        <div class="add-product-card">
+            <div class="card-header-custom">
+                <h2 class="card-title">
+                    <i class="fas fa-box"></i>
+                    Nouveau Produit
+                    <span class="product-counter" id="productCounter">0</span>
+                </h2>
+                <div class="quick-actions">
+                    <button class="btn-quick" onclick="duplicateLastProduct()">
+                        <i class="fas fa-copy"></i>
+                        Dupliquer dernier
+                    </button>
+                    <button class="btn-quick" onclick="clearForm()">
+                        <i class="fas fa-eraser"></i>
+                        Effacer
+                    </button>
+                </div>
+            </div>
+
+            <form id="productForm">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nom" class="form-label">
+                            Nom du produit <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nom" name="nom" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prix" class="form-label">
+                            Prix <span class="required">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="prix" name="prix" step="0.01" min="0" required placeholder="0.00">
+                            <span class="input-group-text">$</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categorie" class="form-label">
+                            Catégorie <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="categorie" name="categorie_id" required>
+                            <option value="">Sélectionner une catégorie</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <input type="hidden" name="statut" value="EN_ATTENTE">
+
+                </div>
+
+                <div class="image-section">
+                    <label class="form-label">Image du produit</label>
+                    
+                    <div class="image-buttons">
+                        <button type="button" class="btn-image" id="cameraBtn">
+                            <i class="fas fa-camera"></i>
+                            Caméra
+                        </button>
+                        <button type="button" class="btn-image" id="uploadBtn">
+                            <i class="fas fa-upload"></i>
+                            Parcourir
+                        </button>
+                        <button type="button" class="btn-image" id="urlBtn">
+                            <i class="fas fa-link"></i>
+                            URL
+                        </button>
+                    </div>
+
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    
+                    <div class="video-container" id="videoContainer">
+                        <video id="camera-video" autoplay muted playsinline></video>
+                        <div class="camera-controls">
+                            <button type="button" class="btn-camera-control" onclick="switchCamera()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button type="button" class="btn-camera-control capture" id="captureBtn">
+                                <i class="fas fa-camera fa-2x"></i>
+                            </button>
+                            <button type="button" class="btn-camera-control" onclick="closeCamera()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                        <div class="image-preview">
+                            <img id="previewImg" src="" alt="Aperçu">
+                            <button type="button" class="remove-image" onclick="removeImage()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Glissez une image ou cliquez pour sélectionner</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description détaillée du produit..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Enregistrer
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="saveAndNew()">
+                        <i class="fas fa-plus"></i>
+                        Enregistrer et nouveau
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                        <i class="fas fa-times"></i>
+                        Annuler
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div>
+            <strong>Succès!</strong>
+            <p class="mb-0">Produit ajouté avec succès</p>
+        </div>
+    </div>
+
+    <!-- Keyboard shortcut hint -->
+    <div class="shortcut-hint" id="shortcutHint">
+        Ctrl+S: Enregistrer | Ctrl+N: Nouveau | Ctrl+D: Dupliquer
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let productCount = 0;
+        let lastProductData = null;
+        let currentImage = null;
+        let stream = null;
+        let currentCamera = 'environment';
+
+        // Initialize
+        // Fonction de déconnexion
+        function confirmLogout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        }
+        
+        // Rendre la fonction globale
+        window.confirmLogout = confirmLogout;
+        
+        $(document).ready(function() {
+            // File input
+            $('#fileInput').change(function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleImageFile(file);
+                }
+            });
+
+            // Camera button
+            $('#cameraBtn').click(function() {
+                startCamera();
+            });
+
+            // Upload button
+            $('#uploadBtn').click(function() {
+                $('#fileInput').click();
+            });
+
+            // URL button
+            $('#urlBtn').click(function() {
+                const url = prompt('Entrez l\'URL de l\'image:');
+                if (url) {
+                    handleImageURL(url);
+                }
+            });
+
+            // Capture button
+            $('#captureBtn').click(function() {
+                capturePhoto();
+            });
+
+            // Drag and drop
+            const uploadPlaceholder = $('#uploadPlaceholder');
+            
+            uploadPlaceholder.on('click', function() {
+                $('#fileInput').click();
+            });
+
+            uploadPlaceholder.on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('dragover');
+            });
+
+            uploadPlaceholder.on('dragleave', function() {
+                $(this).removeClass('dragover');
+            });
+
+            uploadPlaceholder.on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('dragover');
+                
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageFile(files[0]);
+                }
+            });
+
+            // Form submission
+            $('#productForm').submit(function(e) {
+                e.preventDefault();
+                saveProduct();
+            });
+
+            // Keyboard shortcuts
+            $(document).keydown(function(e) {
+                if (e.ctrlKey) {
+                    switch(e.key) {
+                        case 's':
+                            e.preventDefault();
+                            saveProduct();
+                            break;
+                        case 'n':
+                            e.preventDefault();
+                            clearForm();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            duplicateLastProduct();
+                            break;
+                    }
+                }
+            });
+
+            // Show shortcut hint on hover
+            setTimeout(function() {
+                $('#shortcutHint').addClass('show');
+                setTimeout(function() {
+                    $('#shortcutHint').removeClass('show');
+                }, 3000);
+            }, 2000);
+        });
+
+        // Handle image file
+        function handleImageFile(file) {
+            currentImage = file;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                displayImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle image URL
+        function handleImageURL(url) {
+            currentImage = url;
+            displayImage(url);
+        }
+
+        // Display image
+        function displayImage(src) {
+            $('#previewImg').attr('src', src);
+            $('#uploadPlaceholder').hide();
+            $('#imagePreviewContainer').show();
+        }
+
+        // Remove image
+        function removeImage() {
+            currentImage = null;
+            $('#previewImg').attr('src', '');
+            $('#uploadPlaceholder').show();
+            $('#imagePreviewContainer').hide();
+            $('#fileInput').val('');
+        }
+
+        // Camera functions
+        function startCamera() {
+            $('#videoContainer').show();
+            $('#uploadPlaceholder').hide();
+            $('#imagePreviewContainer').hide();
+            
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: currentCamera } 
+            })
+            .then(function(mediaStream) {
+                stream = mediaStream;
+                $('#camera-video')[0].srcObject = stream;
+            })
+            .catch(function(error) {
+                console.error('Camera error:', error);
+                alert('Impossible d\'accéder à la caméra');
+            });
+        }
+
+        function switchCamera() {
+            currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+            closeCamera();
+            startCamera();
+        }
+
+        function closeCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            $('#videoContainer').hide();
+            $('#uploadPlaceholder').show();
+        }
+
+        function capturePhoto() {
+            const video = $('#camera-video')[0];
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0);
+            
+            canvas.toBlob(function(blob) {
+                currentImage = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
+                displayImage(URL.createObjectURL(blob));
+                closeCamera();
+            });
+        }
+
+        // Form functions
+        function getFormData() {
+            return {
+                nom: $('#nom').val(),
+                prix: $('#prix').val(),
+                categorie_id: $('#categorie').val(),
+                statut: $('#statut').val(),
+                description: $('#description').val(),
+                image: currentImage
+            };
+        }
+
+        function setFormData(data) {
+            $('#nom').val(data.nom || '');
+            $('#prix').val(data.prix || '');
+            $('#categorie').val(data.categorie_id || '');
+            $('#statut').val(data.statut || 'VALIDE');
+            $('#description').val(data.description || '');
+            
+            if (data.image) {
+                currentImage = data.image;
+                if (typeof data.image === 'string') {
+                    displayImage(data.image);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        displayImage(e.target.result);
+                    };
+                    reader.readAsDataURL(data.image);
+                }
+            }
+        }
+
+        function clearForm() {
+            $('#productForm')[0].reset();
+            removeImage();
+            $('#nom').focus();
+        }
+
+        function duplicateLastProduct() {
+            if (lastProductData) {
+                setFormData(lastProductData);
+                $('#nom').val(lastProductData.nom + ' - Copie');
+                $('#nom').focus();
+            }
+        }
+
+        function saveProduct() {
+            const formData = new FormData();
+            const data = getFormData();
+            
+            // Ajouter les données au FormData
+            formData.append('nom', data.nom);
+            formData.append('prix', data.prix);
+            formData.append('categorie_id', data.categorie_id);
+            formData.append('statut', data.statut);
+            formData.append('description', data.description);
+            
+            // Ajouter l'image si elle existe
+            if (data.image) {
+                formData.append('image', data.image);
+            }
+            
+            // Ajouter le token CSRF
+            const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+            formData.append('csrfmiddlewaretoken', csrfToken);
+
+            // Envoyer la requête
+            $.ajax({
+                url: '{% url "employe_products_create" %}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    // Sauvegarder les données pour duplication
+                    lastProductData = data;
+                    productCount++;
+                    $('#productCounter').text(productCount);
+                    showNotification('success', 'Produit ajouté avec succès');
+                    clearForm();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erreur:', error);
+                    let errorMessage = 'Une erreur est survenue lors de l\'ajout du produit';
+                    
+                    // Essayer de récupérer un message d'erreur personnalisé
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        // Utiliser le message par défaut
+                    }
+                    
+                    showNotification('error', errorMessage);
+                }
+            });
+        }
+
+        function saveAndNew() {
+            saveProduct();
+            clearForm();
+        }
+
+        function showNotification(type = 'success', message = 'Produit ajouté avec succès') {
+            const notification = $('#notification');
+            const icon = notification.find('i');
+            const title = notification.find('strong');
+            const text = notification.find('p');
+            
+            // Réinitialiser les classes
+            notification.removeClass('success error warning');
+            
+            // Configurer selon le type
+            if (type === 'success') {
+                notification.css('background', 'linear-gradient(135deg, var(--success-color), #059669)');
+                icon.removeClass().addClass('fas fa-check-circle');
+                title.text('Succès!');
+            } else if (type === 'error') {
+                notification.css('background', 'linear-gradient(135deg, var(--danger-color), #DC2626)');
+                icon.removeClass().addClass('fas fa-exclamation-circle');
+                title.text('Erreur!');
+            } else if (type === 'warning') {
+                notification.css('background', 'linear-gradient(135deg, var(--warning-color), #D97706)');
+                icon.removeClass().addClass('fas fa-exclamation-triangle');
+                title.text('Attention!');
+            }
+            
+            text.text(message);
+            notification.addClass('show');
+            
+            setTimeout(function() {
+                notification.removeClass('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
