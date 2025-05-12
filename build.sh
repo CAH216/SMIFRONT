@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
-
 # Exit on error
-set -e
+set -o errexit
 
-echo "🔄 Installing dependencies..."
+# Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-echo "📊 Collecting static files..."
-python manage.py collectstatic --noinput
+# Create necessary directories
+mkdir -p staticfiles
+mkdir -p media
 
-echo "🗄️ Running migrations..."
+# Collect static files
+python manage.py collectstatic --noinput --clear
+
+# Run migrations
 python manage.py migrate
 
-echo "✅ Build complete!"
+# List static files for debugging
+echo "Static files collected:"
+ls -la staticfiles/

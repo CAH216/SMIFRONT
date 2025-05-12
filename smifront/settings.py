@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import environ
+from django.contrib import staticfiles
 
 # Initialisation de django-environ
 env = environ.Env()
@@ -99,9 +100,14 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
+# Static files configuration
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Pour la collecte
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Vos fichiers statiques sources
+]
+
+# WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
